@@ -33,6 +33,74 @@ class LimitLevel:
         self.price = order.price
         self.size = order.size 
 
+        self.parent = None 
+        self.left_child = None
+        self.right_child = None
+
+        self.orders = OrderList(self)
+        self.append(order)
+    
+    @property 
+    def is_root(self):
+        return isinstance(self.parent, LimitLevelTree)
+    
+    @property
+    def volume(self):
+        return self.price*self.size
+    
+    @property
+    def balance_factor(self):
+        #Return the balance value of this particualr node
+
+        right_height = self.right_child.height if self.right_child else 0
+        left_height = self.left_child.height if self.left_child else 0
+
+        return right_height-left_height
+    
+    @property
+    def grandpa(self):
+        try:
+            if self.parent:
+                return self.parent.parent
+            else :
+                return None
+        
+        except AttributeError:
+            return None
+    
+    @property
+    def height (self):
+        #Return the height of this node 
+        left_height = self.left_child.height if self.left_child else 0
+        right_height = self.right_child.height if self.right_child else 0
+        if left_height>right_height:
+            return left_height+1
+        else :
+            return right_height+1
+        
+    @property
+    def min(self):
+        #return smallest node under this node
+
+        minimum = self
+        while minimum.left_child:
+            minimum = minimum.left_child
+        return minimum
+    
+
+    def append (self, order)
+        #Wrapper for append in OrderList
+        return self.orders.append(order)
+    
+    def _replace_node_in_parent(self, new_value = None)
+        
+    def remove(self):
+        #Delete this particular limit level
+        
+
+    def __len__(self):
+        return len(self.orders)
+
 
 
 
@@ -45,7 +113,15 @@ class LimitLevelTree:
         self.right_child = None
         self.is_root = True
 
-    def insert(self,limit_level)
+    def insert(self,limit_level):
+        current_node = self
+        while True:
+            if current_node.is_root or limit_level.price>current_node.price:
+                if current_node.right_child is None :
+                    current_node
+            
+            
+        
 
 class OrderList:
     #Doubly linked list, list class 
@@ -57,6 +133,20 @@ class OrderList:
         self.tail = None
         self.count = 0
         self.parent_limit = parent_limit
+    
+    def __len__ (self):
+        return self.count
+    
+    def append (self,order)
+        #Append order to this list 
+        if self.tail is None :
+            order.root = self 
+            self.tail = order
+            self.head = order 
+            self.count +=1
+
+        else :
+            self.tail.append(order)
 
 
 class Order:
