@@ -88,15 +88,131 @@ class LimitLevel:
         return minimum
     
 
-    def append (self, order)
+    def append (self, order):
         #Wrapper for append in OrderList
         return self.orders.append(order)
     
-    def _replace_node_in_parent(self, new_value = None)
+    def _replace_node_in_parent(self, new_value = None):
+        
+        if not self.is_root:
+            if self==self.parent.left_child:
+                self.parent.left_child = new_value
+            else :
+                self.parent.right_child= new_value
+
+        if new_value:
+            new_value.parent = self.parent
         
     def remove(self):
         #Delete this particular limit level
+        if self.left_child and self.right_child:
+            succ = self.right_child.min
+            
+            self.left_child, succ.left_child = succ.left_child, self.left_child
+            self.right_child, succ.right_child = succ.right_child, self.right_child
+            self.parent, succ.parent = succ.parent, self.parent
+            self.remove()
+            self.balace_grandpa()
+
+        elif self.left_child:
+            self._replace_node_in_parent(self.left_child)
+        elif self.right_child:
+            self._replace_node_in_parent(self.right_child)
+        else:
+            self._replace_node_in_parent(None)
+
+    def balance_grandpa(self):
+        #checks if grandparent needs replacing
+
+        if self.grandpa and self.grandpa.is_root:
+            pass 
+        elif self.grandpa and not self.grandpa.is_root:
+            self.grandpa.balance()
+        elif self.grandpa is None:
+            pass
+        else :
+            raise NotImplementedError
+        return 
+    def balance(self):
+        #Rotation method for the node's balance factor 
+        if self.balance_factor>1:
+        #right subtree heavier 
+            if self.right_child.balance_factor<0:
+            #right_child.left is heavier 
+                self._rl_case()
+            elif self.right_child.balance_factor>0:
+            #right_child.right is heavier 
+                self._rr_case()
+        elif self.balance_factor<-1
+        #left is heavier 
+            if self.left_child.balance_factor<0:
+                self._ll_case()
+            elif self.left_child.balance_factor>0:
+                self._lr_case()
         
+        else :
+            pass 
+
+        if not self.is_root and not self.parent.is_root:
+            self.parent.balance()
+
+
+    def _ll_case(self):
+        #rotate nodes for ll case
+        child= self.left_child
+        if self.parent.is_root or self.price>self.parent.price:
+            self.parent.right_child = child 
+        else :
+            self.parent.left_child = child 
+
+        child.parent, self.parent = self.parent , child 
+        child.right_child , self.left_child  = self, child.right_child 
+
+    def _rr_case(self):
+        #rotate nodes for rr case
+
+        child = self.right_child
+        if self.parent.is_root or self.price >self.parent.price:
+            self.parent.right_child = child
+        else :
+            self.parent.left_child = child 
+        
+
+        child.parent, self.parent = self.parent, child
+        child.left_child, self.right_child = self, child.left_child
+    
+    def _lr_case(self):
+        #rotate nodes for lr case 
+        child, grand_child = self.left_child, self.left_child.right_child 
+        child.parent, grand_child.parent = grand_child, self
+        child.right_child = grand_child.left_child 
+        self.left_child, grand_child.left_child = grand_child, child
+        self._ll_case()
+        
+
+    def _rl_case(self):
+        #rotate nodes in rl case
+        child, grand_child = self.right_child, self.right_child.left_child 
+        child.parent, grand_child.parent = grand_child, self
+        child.left_child = grand_child.right_child 
+        self.right_child,grand_child.right_child = grand_child, child
+        self._rr_case()
+
+
+    def __str__(self):
+        if not self.is_root:
+            s = 'Node Value %s\n'%self.price
+            s+='Node left_child value: %s\n'%(self.left_child.price if self.left_child else 'None')
+            s+='Node right child value: %s\n\n'%(self.right_child.price if self.right_child else 'None')
+        else : 
+            s = ''
+
+        left_side_print =self.left_child.__str__() if self.left_child else ''
+        right_side_print = self.right_child.__str__() if self.right_child else ''
+        return s + left_side_print +right_side_print 
+    
+    
+
 
     def __len__(self):
         return len(self.orders)
@@ -137,7 +253,7 @@ class OrderList:
     def __len__ (self):
         return self.count
     
-    def append (self,order)
+    def append (self,order):
         #Append order to this list 
         if self.tail is None :
             order.root = self 
