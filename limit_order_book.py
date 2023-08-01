@@ -20,7 +20,18 @@ class LimitOrderBook:
         #Returns the best available bid and ask
         return self.best_bid, self.best_ask
     
-    def process(self, order)
+    def process(self, order):
+        #process the order
+        if order.size ==0:
+            self.remove(order)
+    
+    def update(self, order):
+
+    def remove(self, order):
+    
+    def add(self, order):
+
+    def levels(self, depth = None):
         
 
 
@@ -188,7 +199,7 @@ class LimitLevel:
         child.right_child = grand_child.left_child 
         self.left_child, grand_child.left_child = grand_child, child
         self._ll_case()
-        
+
 
     def _rl_case(self):
         #rotate nodes in rl case
@@ -234,8 +245,24 @@ class LimitLevelTree:
         while True:
             if current_node.is_root or limit_level.price>current_node.price:
                 if current_node.right_child is None :
-                    current_node
-            
+                    current_node.right_child = limit_level
+                    current_node.right_child.parent = current_node
+                    current_node.right_child.balance_grandpa()
+                    break
+                else :
+                    current_node - current_node.right_child
+                    continue
+            elif limit_level.price< current_node.price:
+                if current_node.left_child is None :
+                    current_node.left_child = limit_level
+                    current_node.left_child.parent = current_node
+                    current_node.left_child.balace_grandpa()
+                    break
+                else :
+                    current_node = current_node.left_child
+                    continue
+            else :
+                break
             
         
 
